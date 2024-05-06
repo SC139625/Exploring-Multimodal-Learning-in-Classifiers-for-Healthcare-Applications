@@ -104,7 +104,7 @@ echo "All files downloaded."
 1. **Data Preparation**: Load your data and split it into training, validation, and test sets.
 > - Update the file path variables in the notebook to point to your dataset location. The two provided csv datasets are "final_cxr_free_text75.csv" and "final_cxr_free_text.csv" for the subsampled and full datasets.
 
-> - As well, during the creation of the custom dataset for training and evaluation, ensure that the datapath to the images are correctly updated according to where the downloaded files from the above bash script are stored.
+> - As well, during the creation of the custom dataset for training and evaluation, ensure that the datapath to the images are correctly updated according to where the downloaded files from the above bash script are stored.![alt text](image.png)
 
 > - The structure of the CXR images directory should be /Dir_Name/(* images in .jpg). There should not be any nesting of subdirectories.
 2. **Model Training**: Use the provided `MultimodalModel` `ImageModel` or `TextModel ` class to train the model on your dataset depending on which .ipynb notebook you are running. The provided jupyter notebooks both include the training loops defined for the full and subsampled datasets. 
