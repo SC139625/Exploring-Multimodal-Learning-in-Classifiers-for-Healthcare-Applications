@@ -3,8 +3,7 @@
 This collection of 3 Jupyter notebooks demonstrates the development of a deep learning model that integrates both image and textual data to diagnose pneumonia along with the two Uni-modal models that it is composed of. It leverages PyTorch, PyTorch Lightning, and the Hugging Face Transformers library to train a model using both chest X-ray images and associated clinical text.
 
 ## Abstract:
-The efficient integration of multimodal data is a cornerstone of robust deep learning applications, particularly in healthcare, where diverse patient information can significantly im-
-pact diagnostic accuracy. The primary objective of this project is to develop a multi-modal
+The efficient integration of multimodal data is a cornerstone of robust deep learning applications, particularly in healthcare, where diverse patient information can significantly impact diagnostic accuracy. The primary objective of this project is to develop a multi-modal
 model that can integrate MIMIC IV CXR imaging data with corresponding radiology notes
 to distinguish between ’pneumonia’ and ’not pneumonia’ cases. These non-pneumonia cases
 are the absence of any abnormal pulmonary diseases classified by the ChexPert model. A
@@ -17,7 +16,7 @@ different loss functions. Our results demonstrate that multi-modal models, which
 both text and image data, were able to perform competitively with their single modality
 counterparts across a variety of metrics in a context where class imbalance was less significant. These findings hold value for those considering the deployment of machine learning
 models in clinical settings, where accurate interpretation of multi-modal data is ideal for
-patient outcomes
+patient outcomes.
 
 
 ## Prerequisites
