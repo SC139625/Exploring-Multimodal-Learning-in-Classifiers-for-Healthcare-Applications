@@ -54,12 +54,57 @@ The model expects a dataset containing labeled images and their corresponding te
 
 
 
+## Downloading the Dataset
+
+The model requires a specific dataset from the MIMIC-CXR-JPG repository. Follow the steps below to download the necessary images:
+
+### Prerequisites
+- Ensure you have `wget` installed on your system. If `wget` is not available by default, you may need to load it using a module system on your server (common in HPC environments).
+- You will need access credentials for the PhysioNet repository where the MIMIC-CXR-JPG dataset is hosted. Obtain these credentials by registering or logging into the [PhysioNet website](https://physionet.org/).
+
+### Download Instructions
+
+1. **Set Up the Environment**:
+   - Navigate to the directory where you want to download the data.
+   - Ensure you have sufficient storage available as the dataset is large.
+
+2. **Download Script**:
+   - Use the provided Bash script to automate the download of image files. Here is the script you need to execute:
+
+```bash
+#!/bin/bash
+#SBATCH --job-name=download_files
+#SBATCH --output=download_files_%j.out
+#SBATCH --error=download_files_%j.err
+#SBATCH --time=24:00:00
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=10
+
+# Directory to store the downloaded files
+DESTINATION="/scratch/your_username/data"
+
+# Base URL for the file downloads
+BASE_URL="https://physionet.org/files/mimic-cxr-jpg/2.0.0/"
+
+# File containing the list of paths to download
+FILE_PATHS="picturepaths.txt"
+
+# Ensure the destination directory exists
+mkdir -p $DESTINATION
+
+# Use xargs to parallelize wget downloads
+cat "$FILE_PATHS" | xargs -n 1 -P 10 -I {} wget --user="YOUR_USERNAME" --password='YOUR_PASSWORD' -c "${BASE_URL}{}" -P $DESTINATION
+
+echo "All files downloaded."
+
+```
+
 ## Usage
 
 1. **Data Preparation**: Load your data and split it into training, validation, and test sets.
 > - Update the file path variables in the notebook to point to your dataset location. The two provided csv datasets are "final_cxr_free_text75.csv" and "final_cxr_free_text.csv" for the subsampled and full datasets.
 
-> - As well, during the creation of the custom dataset for training and evaluation, ensure that the datapath to the images are correctly updated.
+> - As well, during the creation of the custom dataset for training and evaluation, ensure that the datapath to the images are correctly updated according to where the downloaded files from the above bash script are stored.
 
 > - The structure of the CXR images directory should be /Dir_Name/(* images in .jpg). There should not be any nesting of subdirectories.
 2. **Model Training**: Use the provided `MultimodalModel` `ImageModel` or `TextModel ` class to train the model on your dataset depending on which .ipynb notebook you are running. The provided jupyter notebooks both include the training loops defined for the full and subsampled datasets. 
