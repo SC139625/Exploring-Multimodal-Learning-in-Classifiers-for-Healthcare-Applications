@@ -106,15 +106,55 @@ echo "All files downloaded."
 
 > - As well, during the creation of the custom dataset for training and evaluation, ensure that the datapath to the images are correctly updated according to where the downloaded files from the above bash script are stored.![alt text](image.png)
 
-> - The structure of the CXR images directory should be /Dir_Name/(* images in .jpg). There should not be any nesting of subdirectories.
+> - The structure of the CXR images directory should be /Dir_Name/(* images in .jpg). There should not be any nesting of subdirectories.![alt text](image-1.png)
 2. **Model Training**: Use the provided `MultimodalModel` `ImageModel` or `TextModel ` class to train the model on your dataset depending on which .ipynb notebook you are running. The provided jupyter notebooks both include the training loops defined for the full and subsampled datasets. 
 > - Depending on which loss function you decide to train with, include the intended one in the pytorch lightning trainer instantiation within the script and name everything including logs and experiment results appropriately prior to running. 
+
+```python
+from pytorch_lightning.callbacks import EarlyStopping
+from pytorch_lightning import Callback
+from pytorch_lightning.loggers import TensorBoardLogger
+train_steps_per_epoch = len(train_dataset) // batch_size + (len(train_dataset) % batch_size > 0)
+
+
+class ClearCacheCallback(Callback):
+    def on_epoch_end(self, trainer, pl_module):
+        torch.cuda.empty_cache()
+        print("Cleared GPU cache")
+
+logger = TensorBoardLogger('model_logs', name='focal_loss_Multimodal_Full') #Change name to whatever appropriate for current training
+
+# Callbacks
+clear_cache_callback = ClearCacheCallback()
+
+early_stop_callback = EarlyStopping(
+    monitor='val_loss',    
+    patience=3,          
+    verbose=True,
+    mode='min'            # 'min' or 'max' (whether the monitored quantity should decrease or increase)
+)
+trainer = pl.Trainer(logger=logger, 
+                     log_every_n_steps=50,  # Log at the end of each epoch
+                     callbacks=[early_stop_callback, clear_cache_callback],
+                     max_epochs=15, 
+                     devices=1, 
+                     accelerator="gpu" if torch.cuda.is_available() else "cpu") # Automatically choose GPU if available
+
+model = MultimodalModel(num_classes=1, loss_function = FocalLoss()) #or nn.BCEWithLogitsLoss())
+trainer.fit(model, train_dataloaders=train_loader, val_dataloaders =valid_loader)
+trainer.test(model, dataloaders=test_loader)
+```
+
 > - When running focal loss in training, reminder that gamma and alpha values are at a default of 1.5 and 0.85 respectively, make alterations if different values are required. 
+
+
 3. **Evaluation**: Evaluate the model using the validation and test datasets to understand its performance.
 - If running Multimodal.ipynb, there are also Bimodal sensitivity tests that can be run after the other evaluations.
+![alt text](image-2.png)
 
 4. **Logging and Monitoring**: The training process logs metrics which can be viewed using TensorBoard.
 > - The model_logs prior to training should be named appropriately for proper viewing. 
+![alt text](image-3.png)
 
 ## Features
 
